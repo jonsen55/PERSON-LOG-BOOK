@@ -289,26 +289,38 @@ class _DetailScreenState extends State<DetailScreen> {
                       }
                     );
                   },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(Colors.red[400]),
-                    foregroundColor: WidgetStateProperty.all(Colors.white),
-                  ),child: const Text("Delete All"),
+                  style: TextButton.styleFrom(
+                    fixedSize: Size(90, 40), // Sets width to 200 and height to 50
+                    backgroundColor: Colors.red[400],
+                    foregroundColor: Colors.white
+                  ),
+                  // style: ButtonStyle(
+                  //   backgroundColor: WidgetStateProperty.all(Colors.red[400]),
+                  //   foregroundColor: WidgetStateProperty.all(Colors.white),
+                  // ),
+                  child: const Text("Delete All"),
                 ),
             
-                SizedBox(width: 16),
+                SizedBox(width: 8),
                 TextButton(
                   onPressed: () {
                     _save("Save");
                     Navigator.pop(context);
                   },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(Colors.deepPurple[700]),
-                    foregroundColor: WidgetStateProperty.all(Colors.white),
-                  ),child: const Text("Save"),
+                  style: TextButton.styleFrom(
+                    fixedSize: Size(100, 40), // Sets width to 200 and height to 50
+                    backgroundColor: Colors.deepPurple[700],
+                    foregroundColor: Colors.white
+                  ),
+                  // style: ButtonStyle(
+                  //   backgroundColor: WidgetStateProperty.all(Colors.deepPurple[700]),
+                  //   foregroundColor: WidgetStateProperty.all(Colors.white),
+                  // ),
+                  child: const Text("Save"),
                 ),
-                SizedBox(width: 16),
+                SizedBox(width: 8),
                 TextButton(
-                  child: const Text('Cancel'),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.deepPurple),),
                   onPressed: () {
                     Navigator.pop(context);
                   },

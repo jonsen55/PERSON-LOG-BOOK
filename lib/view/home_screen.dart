@@ -218,6 +218,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: InputDecoration(
                       hintText: 'Enter name',
                     ),
+                    // validator: (value){
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please enter your name.'; // Error message
+                    //   }
+                    // },
                   ),
                   SizedBox(height: 16,),
                   TextFormField(
