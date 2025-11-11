@@ -1,12 +1,12 @@
 // import 'dart:ffi';
 
-import 'package:flutter/foundation.dart';
+// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive_third/boxes/boxes.dart';
 import 'package:hive_third/models/person.dart';
 import 'package:hive_third/view/detail_screen.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -56,12 +56,45 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actionsPadding: EdgeInsets.all(15),
         leading: IconButton(
           color: Colors.white,
           onPressed: (){
-          final boxData = Boxes.getData();
-          boxData.deleteAll(boxData.keys);
-          // print(boxData.getAt(0)?.address);
+            showDialog(
+              context: context,
+              builder: (context){
+                return AlertDialog(
+                  title: Row(
+                    children: [
+                      Text("Delete all contacts?", style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 20,
+                      ),)
+                    ],
+                  ),
+                  actions: [
+                    TextButton(onPressed: (){
+                      Navigator.pop(context);
+                    }, child: Text('Cancel'),),
+                    TextButton(onPressed: (){
+                      final boxData = Boxes.getData();
+                      boxData.deleteAll(boxData.keys);
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                        duration: Duration(milliseconds: 900),
+                        backgroundColor: Color.fromARGB(255, 255, 98, 87),
+                        content: Text("Deleted successfully!"),),
+                      );
+                      // data[index].delete();
+                    }, child: Text('Delete', style: TextStyle(color: Colors.red),))
+                  ]
+                );
+              });
+
+          
+          
+          
         }, icon: Icon(Icons.delete_forever)),
         title: Text('Person Log Book',
         style: TextStyle(
@@ -72,12 +105,25 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         toolbarHeight: 70,
         backgroundColor: Colors.deepPurple[700],
+        actions: [
+          IconButton(onPressed: (){
+            // MaterialPageRoute(builder: (context) => DetailScreen());
+          }, icon: Icon(Icons.person_rounded),
+          color: Colors.white,)
+        ],
         
       ),
       body: Container(
         padding: EdgeInsets.all(12),
         child: Column(
           children: [
+            Row(
+              children: [
+              TabBar(
+                tabs: [
+
+                ])
+            ]),
             ValueListenableBuilder<Box<Person>>(
               valueListenable: Boxes.getData().listenable(),
               builder: (context, box, _){
