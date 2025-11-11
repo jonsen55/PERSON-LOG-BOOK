@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive_third/boxes/boxes.dart';
+import 'package:hive_third/components/buildTextField.dart';
 import 'package:hive_third/models/person.dart';
 import 'package:hive_third/view/detail_screen.dart';
 // import 'package:image_picker/image_picker.dart';
@@ -259,11 +260,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundImage: AssetImage('assets/images/1.jpg'),
                   ),
                   SizedBox(height: 16,),
-                  TextFormField(
+                  buildTextField(
+                    prefixIcon: Icons.person,
+                    hintText: 'Enter name',
+                    validator: (value){
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your name.'; // Error message
+                      }
+                    },
                     controller: nameController,
-                    decoration: InputDecoration(
-                      hintText: 'Enter name',
-                    ),
                     // validator: (value){
                     //   if (value == null || value.isEmpty) {
                     //     return 'Please enter your name.'; // Error message
@@ -271,34 +276,45 @@ class _HomeScreenState extends State<HomeScreen> {
                     // },
                   ),
                   SizedBox(height: 16,),
-                  TextFormField(
+                  buildTextField(
+                    prefixIcon: Icons.email,
+                    hintText: 'Enter email',
                     controller: emailController,
-                    decoration: InputDecoration(
-                      hintText: 'Enter email',
-                    )
-                    ),
-                    SizedBox(height: 16,),
-                    TextFormField(
+                    validator: (value){
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email.'; // Error message
+                    }}
+                  ),
+                  SizedBox(height: 16,),
+                    buildTextField(
+                      prefixIcon: Icons.phone,
+                      hintText: 'Enter phone number',
                       keyboardType: TextInputType.number,
                       controller: phoneController,
-                      decoration: InputDecoration(
-                        hintText: 'Enter phone number',
-                      )
-                      ),
-                    SizedBox(height: 16,),
-                    TextFormField(
-                      controller: addressController,
-                      decoration: InputDecoration(
-                        hintText: 'Enter address',
-                      )
+                      validator: (value){
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your phone number.'; // Error message
+                      }}
                     ),
                     SizedBox(height: 16,),
-                    TextFormField(
-                      
+                    buildTextField(
+                      prefixIcon: Icons.location_on,
+                      hintText: 'Enter address',
+                      controller: addressController,
+                      validator: (value){
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your address.'; // Error message
+                      }}
+                    ),
+                    SizedBox(height: 16,),
+                    buildTextField(
+                      prefixIcon: Icons.description,
+                      hintText: 'Enter description',
                       controller: descriptionController,
-                      decoration: InputDecoration(
-                        hintText: 'Description',
-                      )
+                      validator: (value){
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your description.'; // Error message
+                      }}
                     ),
                     SizedBox(height: 16,),
                     // Container(
@@ -335,6 +351,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   data.save();
                   clearTextField();
                   Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      duration: Duration(milliseconds: 1000),
+                      backgroundColor: Colors.deepPurple[700],
+                      content: Text('Added successfully!', style: TextStyle(
+                        color: Colors.white
+                      ),)
+                    )
+                  );
                 }
               },
               child: Text('Add'),
