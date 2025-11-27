@@ -1,336 +1,314 @@
-// import 'dart:nativewrappers/_internal/vm/lib/math_patch.dart';
-
 import 'package:flutter/material.dart';
-// import 'package:hive/hive.dart';
 import 'package:hive_third/models/person.dart';
-// import your model type
-// import 'models/my_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class DetailScreen extends StatefulWidget {
   final Person item;
-  const DetailScreen({Key? key, required this.item}) : super(key: key);
+
+  const DetailScreen({super.key, required this.item});
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  final _descController = TextEditingController();
-  final _editController = TextEditingController();
-  late Person _item;
-
-  @override
-  void initState() {
-    super.initState();
-    _item = widget.item;
-  }
-
-  @override
-  void dispose() {
-    _descController.dispose();
-    super.dispose();
-  }
   
-  Future _showSuccessfulDialog(String value) async {
-    switch(value){
-      case "Save":
-      return ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-          duration: Duration(milliseconds: 900),
-          backgroundColor: Colors.deepPurple,
-          content: Text("Saved successfully!"),),
-      );
-      case "Delete":
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-          duration: Duration(milliseconds: 900),
-          backgroundColor: Color.fromARGB(255, 255, 98, 87),
-          content: Text("Deleted successfully!"),),
-      );
-    }
-  
-  
-  }
-  Future _showNoDescriptionfulDialog(String value) async {
-    return ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: Duration(milliseconds: 1000),
-        backgroundColor: Color.fromARGB(255, 255, 98, 87),
-        content: Text('No description to $value', style: TextStyle(
-        color: Colors.white
-      ),)));
-    }
-  Future<void> _save(String value) async {
-    final newText = _editController.text.trim();
-    final oldText = (_item.description ?? ' ').trim();
-
-
-    if(newText.isEmpty){
-      if(oldText.isEmpty){
-        _showNoDescriptionfulDialog(value);
-      }else{
-        _item.description = _editController.text;
-        await _item.save();
-        if(value == "Delete"){
-          setState(() {
-          });
-          _showSuccessfulDialog(value);
-        }
-      }
-    }else{
-      if(newText != oldText){
-        _item.description = _editController.text;
-        await _item.save();
-        setState(() {
-        });
-        _showSuccessfulDialog(value);
-      }else{
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            duration: Duration(milliseconds: 1000),
-            backgroundColor: Color.fromARGB(255, 255, 98, 87),
-            content: Text('Nothing edited', style: TextStyle(
-            color: Colors.white
-          ),)));
-      }
-        
-    }
-
-    // if(newText.isEmpty){
-    //   if(value == "Save"){
-    //     _showNoDescriptionfulDialog(value);
-    //   }
-    // }else{
-    //   if(value == "Delete"){
-    //     _item.description = _editController.text;
-    //     await _item.save();
-    //   }
-    //   if(newText != oldText){
-    //     _item.description = _editController.text;
-    //     await _item.save();
-    //     _showSuccessfulDialog(value);
-    //     setState(() {
-    //     });
-    //   }
-    // }
-
-
-    // if(newText.isNotEmpty){
-    //   // update the in-memory object
-    //   _item.description = _editController.text;
-    //   await _item.save();
-    //   // _descController.clear();
-
-    //   // show feedback and pop or keep editing
-    //   switch(value)
-    //   {
-    //     case "Save":
-    //     if(newText != oldText){
-    //       _showSuccessfulDialog(value);
-    //     }
-
-    //     break;
-    //     case "Delete":
-    //       _showSuccessfulDialog(value);
-    //     break;        
-    //   }
-    //   setState(() {
-    //   }); // refresh UI if needed
-    // }
-    // else{
-    //   if(value == "Save"){
-    //     _showNoDescriptionfulDialog(value);
-    //   }else{
-    //     _showNoDescriptionfulDialog(value);
-    //   }
-    // }
-  }
-
+  // --- UI Builder ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_item.name,
-        style: TextStyle(
+        title: Text(
+          widget.item.name,
+          style: const TextStyle(
             color: Colors.white,
             fontFamily: 'Montserrat',
-            fontWeight: FontWeight.bold
+            fontWeight: FontWeight.bold,
           ),
         ),
         toolbarHeight: 70,
         backgroundColor: Colors.deepPurple[700],
-        
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
-                children: [
-                  CircleAvatar(
-                radius: 72,
+        child: Column(
+          children: [
+            const SizedBox(height: 30),
+            // Avatar
+            Center(
+              child: CircleAvatar(
+                radius: 70,
                 backgroundColor: Colors.deepPurple[700],
-                backgroundImage: AssetImage('assets/images/1.jpg'),
+                backgroundImage: const AssetImage('assets/images/1.jpg'),
               ),
-              const SizedBox(height: 16),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+            ),
+            const SizedBox(height: 20),
+            
+            // Name (Display Only)
+            Text(
+              widget.item.name,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+
+            const SizedBox(height: 10),
+            
+            // Info Cards
+            _buildInfoTile(Icons.email, widget.item.email),
+            _buildInfoTile(Icons.phone, widget.item.phone.toString()),
+            _buildInfoTile(Icons.location_on, widget.item.address ?? "No address"),
+            
+            const SizedBox(height: 20),
+            const Divider(indent: 40, endIndent: 40),
+            const SizedBox(height: 20),
+
+            // Description Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_item.email, style: TextStyle(fontWeight: FontWeight.w600),),
-                  Text(_item.phone.toString())
+                  const Text(
+                    "Description",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple[50],
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.deepPurple.shade100),
+                    ),
+                    constraints: const BoxConstraints(minHeight: 100),
+                    child: Text(
+                      (widget.item.description == null || widget.item.description!.isEmpty)
+                          ? "No description added yet."
+                          : widget.item.description!,
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1.5,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
                 ],
               ),
-              SizedBox(height: 24),
-              Container(
-                // horizontal line below the details
-                width: 200,
-                height: 1,
-                color: Colors.grey[400],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text("Description: ", style: TextStyle(fontWeight: FontWeight.w500),),
-                ],
-              ),
-              SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(16),
-                height: 210,
-                width: 400,
-                alignment: Alignment.topCenter,
-                decoration: BoxDecoration(
-                  color: Colors.deepPurple[50],
-                  borderRadius: BorderRadius.circular(16),
-                  // boxShadow:[
-                  //   BoxShadow(
-                  //   color: Colors.grey.withOpacity(0.5), // Shadow color with opacity
-                  //   spreadRadius: 5, // Extends the shadow
-                  //   blurRadius: 7, // Blurs the shadow
-                  //   offset: const Offset(0, 3),
-                  //   ),
-                  // ]
-                ),
-                child: Text(_item.description ?? "No description"),
-              ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              
-            ],
-          ),
+            ),
+            const SizedBox(height: 40),
+          ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        foregroundColor: Colors.deepPurple[700],
-        // onPressed: _save,
-        onPressed: _showMyDialog,
-        child: const Text('Edit'),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Colors.deepPurple[700],
+        foregroundColor: Colors.white,
+        onPressed: _showEditAllDialog,
+        icon: const Icon(Icons.edit),
+        label: const Text('Edit Details'),
       ),
     );
   }
 
-  
-  Future<void> _showMyDialog() async {
-    _editController.text = _item.description.toString();
-  
-    return showDialog<void>(
-      context: context,
-      // barrierDismissible: false, // user must tap button!
-      builder: (context) {
-        return AlertDialog(
-          
-          title: const Text('Edit Description'),
-          content: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: SingleChildScrollView(
-              child: 
-              TextFormField(
-                // initialValue: _item.description,
-                controller: _editController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16)
-                  )
-                ),
-              )
-            ),
+  Widget _buildInfoTile(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 20, color: Colors.deepPurple),
+          const SizedBox(width: 10),
+          Text(
+            text,
+            style: TextStyle(fontSize: 16, color: Colors.grey[800]),
           ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context){
-                        return AlertDialog(
-                          title: Text("Delete description?", style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 20,
-                          ),),
-                          actions: [
-                            TextButton(onPressed: (){
-                              Navigator.pop(context);
-                            }, child: Text('Cancel'),),
-                            TextButton(onPressed: (){
-                              _editController.clear();
-                              _save("Delete");
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            }, child: Text('Delete', style: TextStyle(color: Colors.red),))
-                          ]
-                        );
-                      }
-                    );
-                  },
-                  style: TextButton.styleFrom(
-                    fixedSize: Size(90, 40), // Sets width to 200 and height to 50
-                    backgroundColor: Colors.red[400],
-                    foregroundColor: Colors.white
+        ],
+      ),
+    );
+  }
+
+  // --- Dialog & Logic ---
+
+  Future<void> _showEditAllDialog() async {
+    final emailController = TextEditingController(text: widget.item.email);
+    final phoneController = TextEditingController(text: widget.item.phone.toString());
+    final addressController = TextEditingController(text: widget.item.address);
+    final descController = TextEditingController(text: widget.item.description ?? '');
+
+    bool isSensitiveLocked = true;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        // StatefulBuilder is CRITICAL here to update the switch and textfields 
+        // without closing the dialog
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Edit Contact'),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: isSensitiveLocked ? Colors.red[50] : Colors.green[50],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isSensitiveLocked ? Colors.red.shade200 : Colors.green.shade200
+                          )
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  isSensitiveLocked ? Icons.lock : Icons.lock_open,
+                                  color: isSensitiveLocked ? Colors.red : Colors.green,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  isSensitiveLocked ? "Info Locked" : "Editing Enabled",
+                                  style: TextStyle(
+                                    color: isSensitiveLocked ? Colors.red : Colors.green[800],
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Switch(
+                              value: !isSensitiveLocked,
+                              activeThumbColor: Colors.green,
+                              onChanged: (value) {
+                                setState(() {
+                                  isSensitiveLocked = !value;
+                                });
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildDialogTextField(
+                        controller: emailController,
+                        label: "Email",
+                        icon: Icons.email,
+                        enabled: !isSensitiveLocked, 
+                      ),
+                      const SizedBox(height: 12),
+
+                      _buildDialogTextField(
+                        controller: phoneController,
+                        label: "Phone",
+                        icon: Icons.phone,
+                        isNumber: true,
+                        enabled: !isSensitiveLocked,
+                      ),
+                      const SizedBox(height: 12),
+
+                      _buildDialogTextField(
+                        controller: addressController,
+                        label: "Address",
+                        icon: Icons.location_on,
+                        enabled: true, 
+                      ),
+                      const SizedBox(height: 12),
+
+                      _buildDialogTextField(
+                        controller: descController,
+                        label: "Description",
+                        icon: Icons.description,
+                        maxLines: 3,
+                        enabled: true,
+                      ),
+                    ],
                   ),
-                  // style: ButtonStyle(
-                  //   backgroundColor: WidgetStateProperty.all(Colors.red[400]),
-                  //   foregroundColor: WidgetStateProperty.all(Colors.white),
-                  // ),
-                  child: const Text("Delete All"),
                 ),
-            
-                SizedBox(width: 8),
+              ),
+              actions: [
                 TextButton(
-                  onPressed: () {
-                    _save("Save");
-                    Navigator.pop(context);
-                  },
-                  style: TextButton.styleFrom(
-                    fixedSize: Size(100, 40), // Sets width to 200 and height to 50
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple[700],
-                    foregroundColor: Colors.white
+                    foregroundColor: Colors.white,
                   ),
-                  // style: ButtonStyle(
-                  //   backgroundColor: WidgetStateProperty.all(Colors.deepPurple[700]),
-                  //   foregroundColor: WidgetStateProperty.all(Colors.white),
-                  // ),
-                  child: const Text("Save"),
-                ),
-                SizedBox(width: 8),
-                TextButton(
-                  child: const Text('Cancel', style: TextStyle(color: Colors.deepPurple),),
-                  onPressed: () {
-                    Navigator.pop(context);
+                  onPressed: () async {
+                    // Update Hive Object
+                    widget.item.email = emailController.text.trim();
+                    widget.item.phone = int.tryParse(phoneController.text.trim()) ?? widget.item.phone;
+                    widget.item.address = addressController.text.trim();
+                    widget.item.description = descController.text.trim();
+
+                    await widget.item.save();
+
+                    // Update UI and Close
+                    if (mounted) {
+                      setState(() {}); // Updates the main screen behind dialog
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Details updated successfully!"),
+                          backgroundColor: Colors.deepPurple,
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    }
                   },
+                  child: const Text('Save Changes'),
                 ),
               ],
-            ),       
-          ],
+            );
+          },
         );
       },
     );
+  }
 
+  // Helper widget to make the dialog code cleaner
+  Widget _buildDialogTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool isNumber = false,
+    int maxLines = 1,
+    required bool enabled,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: isNumber ? TextInputType.phone : TextInputType.text,
+      maxLines: maxLines,
+      enabled: enabled, // This controls the lock
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: enabled ? Colors.deepPurple : Colors.grey),
+        filled: true,
+        fillColor: enabled ? Colors.white38 : Colors.grey[200],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        disabledBorder: OutlineInputBorder( // Style when locked
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+      ),
+    );
   }
 }

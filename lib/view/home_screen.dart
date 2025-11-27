@@ -1,32 +1,49 @@
-// import 'dart:ffi';
-
-// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+// Assuming these are your local files. Ensure paths are correct.
 import 'package:hive_third/boxes/boxes.dart';
 import 'package:hive_third/components/buildTextField.dart';
 import 'package:hive_third/models/person.dart';
 import 'package:hive_third/view/detail_screen.dart';
-// import 'package:image_picker/image_picker.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-
-  
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  // Controllers
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
   final addressController = TextEditingController();
   final descriptionController = TextEditingController();
+  
+  // Tab & Form Keys
+  late TabController tabController = TabController(length: 2, vsync: this);
+  final _formKey = GlobalKey<FormState>();
 
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 2, vsync: this);
+  }
 
-  Future<void> clearTextField() async{
+  @override
+  void dispose() {
+    // Always dispose controllers to prevent memory leaks
+    nameController.dispose();
+    phoneController.dispose();
+    emailController.dispose();
+    addressController.dispose();
+    descriptionController.dispose();
+    tabController.dispose();
+    super.dispose();
+  }
+
+  Future<void> clearTextField() async {
     nameController.clear();
     emailController.clear();
     phoneController.clear();
@@ -34,351 +51,287 @@ class _HomeScreenState extends State<HomeScreen> {
     descriptionController.clear();
   }
 
-  /// Pick an image from the gallery and store it in Hive
-
-  // Future<void> pickAndStoreImage() async {
-  //   final picker = ImagePicker();
-  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-  //   if (pickedFile != null) {
-  //     final imageBytes = await pickedFile.readAsBytes();
-  //     final imageUint8List = Uint8List.fromList(imageBytes);
-
-  //     final box = Hive.box('person_box');
-  //     await box.put('myImageKey', imageUint8List); // Store with a unique key
-  //     print('Image stored in Hive!');
-  //   } else {
-  //     print('No image selected.');
-  //   }
-  // }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actionsPadding: EdgeInsets.all(15),
-        leading: IconButton(
-          color: Colors.white,
-          onPressed: (){
-            showDialog(
-              context: context,
-              builder: (context){
-                return AlertDialog(
-                  title: Row(
-                    children: [
-                      Text("Delete all contacts?", style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 20,
-                      ),)
-                    ],
-                  ),
-                  actions: [
-                    TextButton(onPressed: (){
-                      Navigator.pop(context);
-                    }, child: Text('Cancel'),),
-                    TextButton(onPressed: (){
-                      final boxData = Boxes.getData();
-                      boxData.deleteAll(boxData.keys);
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                        duration: Duration(milliseconds: 900),
-                        backgroundColor: Color.fromARGB(255, 255, 98, 87),
-                        content: Text("Deleted successfully!"),),
-                      );
-                      // data[index].delete();
-                    }, child: Text('Delete', style: TextStyle(color: Colors.red),))
-                  ]
-                );
-              });
-
-          
-          
-          
-        }, icon: Icon(Icons.delete_forever)),
-        title: Text('Person Log Book',
-        style: TextStyle(
+        title: const Text(
+          'Person Log Book',
+          style: TextStyle(
             color: Colors.white,
             fontFamily: 'Montserrat',
-            fontWeight: FontWeight.bold
+            fontWeight: FontWeight.bold,
           ),
         ),
-        toolbarHeight: 70,
         backgroundColor: Colors.deepPurple[700],
+        toolbarHeight: 70,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          IconButton(onPressed: (){
-            // MaterialPageRoute(builder: (context) => DetailScreen());
-          }, icon: Icon(Icons.person_rounded),
-          color: Colors.white,)
+          IconButton(
+            onPressed: () {
+               // Navigation to profile or other action
+            },
+            icon: const Icon(Icons.person_rounded),
+          )
         ],
-        
-      ),
-      body: Container(
-        padding: EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Row(
-              children: [
-              TabBar(
-                tabs: [
-
-                ])
-            ]),
-            ValueListenableBuilder<Box<Person>>(
-              valueListenable: Boxes.getData().listenable(),
-              builder: (context, box, _){
-                var data = box.values.toList().cast<Person>();
-                return Expanded(
-                  child: ListView.builder(
-                    itemCount: data.length,
-                    itemBuilder: (context, index){
-                      return GestureDetector(
-                        onTap: (){
-                          data[index].name;
-
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => DetailScreen(item: data[index])),
-                          );
-
-                        },
-                        child: Card(
-                          elevation: 4,
-                          child: Container(
-                            padding: EdgeInsets.all(4),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Padding(padding: EdgeInsetsGeometry.all(10)),
-                                    CircleAvatar(
-                                      backgroundColor: Colors.deepPurple[700],
-                                      backgroundImage: AssetImage('assets/images/1.jpg'),
-                                    ),
-                                    Padding(padding: EdgeInsetsGeometry.only(right: 12)),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(data[index].name.toString(),
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500
-                                        ),),
-                                        Text(data[index].email.toString(),
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey,
-                                        )),
-                                      ],
-                                    ),
-                                    
-                                  ],
-                                ),
-                                Padding(padding: EdgeInsetsGeometry.only(left: 10)),
-                                IconButton(onPressed: (){
-                                  // _confirmDelete();
-                                  showDialog(
-                                    context: context,
-                                    builder: (context){
-                                      return AlertDialog(
-                                        title: Row(
-                                          children: [
-                                            Text("Delete ", style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 20,
-                                            ),),
-                                            Text(data[index].name.toString()+"?", style: TextStyle(color: Colors.red,
-                                            fontSize: 20),),
-                                          ],
-                                        ),
-                                        actions: [
-                                          TextButton(onPressed: (){
-                                            Navigator.pop(context);
-                                          }, child: Text('Cancel'),),
-                                          TextButton(onPressed: (){
-                                            // final data = Boxes.getData();
-                                            final box = Boxes.getData();
-                                            // data.delete(box.name);
-                                            var data = box.values.toList().cast<Person>();
-                                            box.delete(data[index].key);
-                                            Navigator.pop(context);
-                                            // data[index].delete();
-                                          }, child: Text('Delete', style: TextStyle(color: Colors.red),))
-                                        ]
-                                      );
-                                    });
-
-                                }, icon: Icon(Icons.delete))
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                  ),
-                );
-              }
-            ),
-            
+        // "Delete All" button
+        leading: IconButton(
+          icon: const Icon(Icons.delete_forever),
+          onPressed: _showDeleteAllDialog,
+        ),
+        bottom: TabBar(
+          controller: tabController,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white54,
+          tabs: const [
+            Tab(icon: Icon(Icons.contacts), text: "Contacts"),
+            Tab(icon: Icon(Icons.search), text: "Search"),
           ],
         ),
       ),
+      body: TabBarView(
+        controller: tabController,
+        children: [
+          _buildContactList(),
+          const Center(child: Text("Search Functionality Coming Soon")),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async{
-          _showMyDialog();
-        },
-        child: Icon(Icons.add),
-        foregroundColor: Colors.deepPurple[700],
+        onPressed: _showAddPersonDialog,
+        shape: const CircleBorder(),
+        backgroundColor: Colors.deepPurple[700],
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
       ),
     );
   }
 
-  // Future<void> _confirmDelete() async{
-  //   return 
-  //   );
-  // }
-  Future<void> _showMyDialog(){
+  Widget _buildContactList() {
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: ValueListenableBuilder<Box<Person>>(
+        valueListenable: Boxes.getData().listenable(),
+        builder: (context, box, _) {
+          final data = box.values.toList().cast<Person>();
+
+          if (data.isEmpty) {
+            return const Center(
+              child: Text("No contacts added yet."),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final person = data[index];
+              return Card(
+                elevation: 3,
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(10),
+                  minTileHeight: MediaQuery.of(context).size.height * 0.08,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => DetailScreen(item: person),
+                      ),
+                    );
+                  },
+                  leading: CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.deepPurple[700],
+                    backgroundImage: const AssetImage('assets/images/1.jpg'),
+                  ),
+                  title: Text(
+                    person.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  subtitle: Text(
+                    person.email,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _showDeleteSingleDialog(person),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  // --- Dialog Methods ---
+
+  Future<void> _showDeleteAllDialog() async {
     return showDialog(
-      context: context, 
-      builder: (context){
-        return AlertDialog(        
-          title: Text('Add person', style: TextStyle(
-            color: Colors.deepPurple[700],
-            fontWeight: FontWeight.bold,
-          ),),
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Delete all contacts?", style: TextStyle(color: Colors.red)),
+          content: const Text("This action cannot be undone."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final boxData = Boxes.getData();
+                boxData.deleteAll(boxData.keys);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("All contacts deleted successfully!"),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showDeleteSingleDialog(Person person) async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Delete ${person.name}?", style: const TextStyle(color: Colors.red)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                person.delete(); // HiveObject delete method
+                Navigator.pop(context);
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showAddPersonDialog() {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'Add Person',
+            style: TextStyle(
+              color: Colors.deepPurple[700],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           content: SizedBox(
             width: MediaQuery.of(context).size.width * 0.9,
             child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 72,
-                    backgroundColor: Colors.deepPurple[700],
-                    backgroundImage: AssetImage('assets/images/1.jpg'),
-                  ),
-                  SizedBox(height: 16,),
-                  buildTextField(
-                    prefixIcon: Icons.person,
-                    hintText: 'Enter name',
-                    validator: (value){
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your name.'; // Error message
-                      }
-                    },
-                    controller: nameController,
-                    // validator: (value){
-                    //   if (value == null || value.isEmpty) {
-                    //     return 'Please enter your name.'; // Error message
-                    //   }
-                    // },
-                  ),
-                  SizedBox(height: 16,),
-                  buildTextField(
-                    prefixIcon: Icons.email,
-                    hintText: 'Enter email',
-                    controller: emailController,
-                    validator: (value){
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email.'; // Error message
-                    }}
-                  ),
-                  SizedBox(height: 16,),
+              child: Form(
+                key: _formKey, // Bind the key here
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.deepPurple[700],
+                      backgroundImage: const AssetImage('assets/images/1.jpg'),
+                    ),
+                    const SizedBox(height: 16),
                     buildTextField(
-                      prefixIcon: Icons.phone,
-                      hintText: 'Enter phone number',
-                      keyboardType: TextInputType.number,
+                      controller: nameController,
+                      hintText: 'Enter name',
+                      prefixIcon: Icons.person,
+                      validator: (value) => value!.isEmpty ? 'Name required' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    buildTextField(
+                      controller: emailController,
+                      hintText: 'Enter email',
+                      prefixIcon: Icons.email,
+                      validator: (value) => value!.isEmpty ? 'Email required' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    buildTextField(
                       controller: phoneController,
-                      validator: (value){
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your phone number.'; // Error message
-                      }}
+                      hintText: 'Enter phone',
+                      prefixIcon: Icons.phone,
+                      keyboardType: TextInputType.phone,
+                      validator: (value) => value!.isEmpty ? 'Phone required' : null,
                     ),
-                    SizedBox(height: 16,),
+                    const SizedBox(height: 16),
                     buildTextField(
-                      prefixIcon: Icons.location_on,
-                      hintText: 'Enter address',
                       controller: addressController,
-                      validator: (value){
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your address.'; // Error message
-                      }}
+                      hintText: 'Enter address',
+                      prefixIcon: Icons.location_on,
+                      validator: (value) => null,
                     ),
-                    SizedBox(height: 16,),
+                    const SizedBox(height: 16),
                     buildTextField(
-                      prefixIcon: Icons.description,
-                      hintText: 'Enter description',
                       controller: descriptionController,
-                      validator: (value){
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your description.'; // Error message
-                      }}
+                      hintText: 'Enter description',
+                      prefixIcon: Icons.description,
+                      validator: (value) => null,
                     ),
-                    SizedBox(height: 16,),
-                    // Container(
-                    //   child: pickAndStoreImage();),
-                    // SizedBox(height: 16,),
-                    // RadioMenuButton(value: 1, groupValue: curren, onChanged: (){
-            
-                    // }, child: child)
-                ],
+                  ],
+                ),
               ),
             ),
           ),
           actions: [
-            TextButton(onPressed: (){
-              clearTextField();
-              Navigator.pop(context);
-            }, child: Text('Cancel')),
             TextButton(
-              onPressed: (){
-                if(nameController.text.isEmpty || emailController.text.isEmpty || phoneController.text.isEmpty){
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      duration: Duration(milliseconds: 1000),
-                      backgroundColor: Color.fromARGB(255, 255, 98, 87),
-                      content: Text('Please fill all the fields', style: TextStyle(
-                        color: Colors.white
-                      ),)
-                    )
+              onPressed: () {
+                clearTextField();
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple[700],
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  final data = Person(
+                    name: nameController.text,
+                    email: emailController.text,
+                    phone: int.tryParse(phoneController.text) ?? 0, 
+                    address: addressController.text,
+                    description: descriptionController.text,
                   );
-                }else{
-                  final data = Person(name: nameController.text, email: emailController.text, phone: int.parse(phoneController.text), address: addressController.text, description: descriptionController.text);
+
                   final box = Boxes.getData();
                   box.add(data);
-                  data.save();
+                  // data.save(); // Not strictly necessary if using box.add, but doesn't hurt
+
                   clearTextField();
                   Navigator.pop(context);
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      duration: Duration(milliseconds: 1000),
+                      duration: const Duration(seconds: 1),
                       backgroundColor: Colors.deepPurple[700],
-                      content: Text('Added successfully!', style: TextStyle(
-                        color: Colors.white
-                      ),)
-                    )
+                      content: const Text('Added successfully!', style: TextStyle(color: Colors.white)),
+                    ),
                   );
                 }
               },
-              child: Text('Add'),
-              style: TextButton.styleFrom(
-                fixedSize: Size(180, 50),// Sets width to 200 and height to 50
-                backgroundColor: Colors.deepPurple[700],
-                foregroundColor: Colors.white
-              ),
-              // ButtonStyle(
-              //   backgroundColor: WidgetStateProperty.all(Colors.deepPurple[700]),
-              //   foregroundColor: WidgetStateProperty.all(Colors.white),
-              //   iconSize: WidgetStateProperty.all(70),
-                // maximumSize: WidgetStateProperty.all(Size(250, 70))
-                // iconSize: WidgetStateProperty.all(70)
-              // ),
+              child: const Text('Add'),
             )
           ],
-          
         );
-      });
+      },
+    );
   }
 }
