@@ -16,8 +16,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool isValidEmail = true;
-  String _email = 'guest';
-  String _password = '';
+  final String _email = 'guest';
+  final String _password = '';
   // SharedPreferences? prefsData;
 
   
