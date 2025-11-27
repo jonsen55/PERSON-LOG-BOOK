@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hive_third/view/login_page.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 import './../components/buildTextField.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -23,15 +22,12 @@ class _RegisterPageState extends State<RegisterPage> {
     );
     if(value == null || value.isEmpty){
       isValidEmail = false;
-      // print("EMPTY XA");
       return 'Please enter an email';
     }else if(!emailValidatorRegExp.hasMatch(value)){
       isValidEmail = false;
-      // print("INVALID XA");
       return 'Please enter a valid email';
     }
     isValidEmail = true;
-    // print("VALID XA");
     return "Successfull";
   }
   bool? isSelected = false;
@@ -43,13 +39,6 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // title: Text('Login',
-        //   style: TextStyle(
-        //       color: Colors.white,
-        //       fontFamily: 'Montserrat',
-        //       fontWeight: FontWeight.bold,
-        //     ),
-        // ),
         toolbarHeight: 0,
         backgroundColor: Colors.deepPurple[700],
       ),
@@ -129,7 +118,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     GestureDetector(
                         onTap: (){
                           response = validateEmail(emailController.text.toString());
-                          // print(response);
                           if(isValidEmail == true){
                             if(passwordController.text.length > 8){
                               // saveData(emailController.text.toString(), passwordController.text.toString());

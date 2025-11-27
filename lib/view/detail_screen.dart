@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_third/models/person.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+// import 'package:hive_flutter/hive_flutter.dart';
 
 class DetailScreen extends StatefulWidget {
   final Person item;
@@ -12,8 +12,6 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  
-  // --- UI Builder ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +32,6 @@ class _DetailScreenState extends State<DetailScreen> {
         child: Column(
           children: [
             const SizedBox(height: 30),
-            // Avatar
             Center(
               child: CircleAvatar(
                 radius: 70,
@@ -43,8 +40,6 @@ class _DetailScreenState extends State<DetailScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            
-            // Name (Display Only)
             Text(
               widget.item.name,
               style: const TextStyle(
@@ -133,9 +128,6 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
     );
   }
-
-  // --- Dialog & Logic ---
-
   Future<void> _showEditAllDialog() async {
     final emailController = TextEditingController(text: widget.item.email);
     final phoneController = TextEditingController(text: widget.item.phone.toString());
@@ -148,8 +140,6 @@ class _DetailScreenState extends State<DetailScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        // StatefulBuilder is CRITICAL here to update the switch and textfields 
-        // without closing the dialog
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
@@ -258,8 +248,6 @@ class _DetailScreenState extends State<DetailScreen> {
                     widget.item.description = descController.text.trim();
 
                     await widget.item.save();
-
-                    // Update UI and Close
                     if (mounted) {
                       setState(() {}); // Updates the main screen behind dialog
                       Navigator.pop(context);
@@ -281,8 +269,6 @@ class _DetailScreenState extends State<DetailScreen> {
       },
     );
   }
-
-  // Helper widget to make the dialog code cleaner
   Widget _buildDialogTextField({
     required TextEditingController controller,
     required String label,
@@ -304,7 +290,7 @@ class _DetailScreenState extends State<DetailScreen> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        disabledBorder: OutlineInputBorder( // Style when locked
+        disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),

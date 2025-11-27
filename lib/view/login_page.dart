@@ -1,10 +1,7 @@
-// import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:hive_third/components/buildTextField.dart';
 import 'package:hive_third/view/home_screen.dart';
 import 'package:hive_third/view/register_page.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

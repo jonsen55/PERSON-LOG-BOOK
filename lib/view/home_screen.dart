@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-// Assuming these are your local files. Ensure paths are correct.
 import 'package:hive_third/boxes/boxes.dart';
 import 'package:hive_third/components/buildTextField.dart';
 import 'package:hive_third/models/person.dart';
@@ -14,7 +13,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-  // Controllers
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
@@ -33,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   @override
   void dispose() {
-    // Always dispose controllers to prevent memory leaks
     nameController.dispose();
     phoneController.dispose();
     emailController.dispose();
